@@ -43,7 +43,7 @@ This reads `tuned_params.json` and saves the trained model to rf_model.pkl.
   ```
 Then go to http://127.0.0.1:8000/docs to use the interactive Swagger UI.
 
-#### Example JSON Input for /predict
+#### Example JSON Input for `/predict`
   ```json
   {
   "Gender_M": 1,
@@ -51,7 +51,7 @@ Then go to http://127.0.0.1:8000/docs to use the interactive Swagger UI.
   "City_Category_B": 1,
   "Stay_In_Current_City_Years_2": 1,
   "Product_Category_1": 5,
-  ...
+
   }
   ```
 
