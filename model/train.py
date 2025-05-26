@@ -7,6 +7,16 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 
+with open("tuned_params.json", "r") as f:
+    tuned_list = json.load(f)
+
+best_params = {
+    "n_estimators": int(tuned_list[0]),
+    "max_depth": int(tuned_list[1]),
+    "min_samples_split": int(tuned_list[2]),
+    "min_samples_leaf": int(tuned_list[3])
+}
+
 def preprocess_data(data_path):
     df = pd.read_csv(data_path)
     df.fillna(-1, inplace=True)
@@ -25,12 +35,13 @@ def train_model(data_path="data/salesdata.csv", model_path="rf_model.pkl", colum
     X_train, X_test, y_train, y_test = preprocess_data(data_path)
 
     model = RandomForestRegressor(
-        n_estimators=100,
-        max_depth=10,
-        min_samples_split=5,
-        min_samples_leaf=2,
+        n_estimators=best_params["n_estimators"],
+        max_depth=best_params["max_depth"],
+        min_samples_split=best_params["min_samples_split"],
+        min_samples_leaf=best_params["min_samples_leaf"],
         random_state=42
     )
+
     model.fit(X_train, y_train)
 
     # Save model
@@ -42,23 +53,10 @@ def train_model(data_path="data/salesdata.csv", model_path="rf_model.pkl", colum
         json.dump(list(X_train.columns), f)
     print(f"📄 Feature columns saved to {columns_path}")
 
-    # === Debug: Feature importance ===
-    print("\n🔍 Top 10 Important Features:")
-    importances = model.feature_importances_
-    columns = X_train.columns
-    top_features = sorted(zip(importances, columns), reverse=True)
-    for score, col in top_features[:10]:
-        print(f"{col}: {score:.4f}")
-
     # === Debug: Prediction distribution ===
     y_pred = model.predict(X_test)
-    print(f"\n📈 R² score on test set: {model.score(X_test, y_test):.4f}")
-    print(f"📊 Mean prediction: {np.mean(y_pred):.2f}, Std Dev: {np.std(y_pred):.2f}")
-    plt.hist(y_pred, bins=30)
-    plt.title("Prediction Distribution")
-    plt.xlabel("Predicted Purchase Amount")
-    plt.ylabel("Frequency")
-    plt.show()
+    print(f"R² score on test set: {model.score(X_test, y_test):.4f}")
+    print(f"Mean prediction: {np.mean(y_pred):.2f}, Std Dev: {np.std(y_pred):.2f}")
 
 if __name__ == "__main__":
     train_model()
